@@ -1,6 +1,6 @@
 {     
     "greeting_tags":["Hi","Hello","Good morning","Good afternoon","Good evening"],
-    "welcome_message":"/n@thehackitect bots...",
+    "welcome_message":"@thehackitect bots...",
     "max_warning":2,
     "warning_structure":{
         "spam":{
