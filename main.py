@@ -252,9 +252,6 @@ def unknown_texts(update, context):
                             bot.delete_message(message_id = message_id,chat_id = group_id)
                         except:
                             pass
-            else:
-            pass
-
 
 def main():
     # Handlers
