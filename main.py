@@ -246,10 +246,13 @@ def unknown_texts(update, context):
                         the_reply = update.message.reply_text("Take your links else where!",parse_mode = ParseMode.HTML)
                         reply_message_id = the_reply.message_id
                         time.sleep(5)
-                        bot.ban_chat_member(chat_id=group_id,user_id=sender_id)
-                        bot.delete_message(message_id = reply_message_id,chat_id = group_id)
-                        bot.delete_message(message_id = message_id,chat_id = group_id)
-        else:
+                        try:
+                            bot.ban_chat_member(chat_id=group_id,user_id=sender_id)
+                            bot.delete_message(message_id = reply_message_id,chat_id = group_id)
+                            bot.delete_message(message_id = message_id,chat_id = group_id)
+                        except:
+                            pass
+            else:
             pass
 
 
