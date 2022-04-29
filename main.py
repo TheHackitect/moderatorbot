@@ -163,7 +163,6 @@ def unknown_commands(update, context):
     sender_name = update._effective_user.first_name
     command = update.message.text
     status = (bot.get_chat_member(user_id = sender_id, chat_id = group_id)).status
-    print(status)
     #bot.unban_chat_member(chat_id=group_id,user_id=sender_id)
     #bot.restrict_chat_member(chat_id=group_id,user_id=sender_id,permissions=ChatPermissions(can_send_messages=False))
     if chat_type =='private':
@@ -171,15 +170,18 @@ def unknown_commands(update, context):
         pass 
     elif chat_type =='supergroup':
         if status == "creator" or status == "administrator":
-            if command == "/ban":
-                bot.ban_chat_member(chat_id=group_id,user_id=replied_to_id)
-            elif command == "/unban":
-                bot.unban_chat_member(chat_id=group_id,user_id=replied_to_id)
-            elif command == "/mute":
-                bot.restrict_chat_member(chat_id=group_id,user_id=replied_to_id,permissions=ChatPermissions(can_send_messages=False))
-            elif command == "/unmute":
-                bot.restrict_chat_member(chat_id=group_id,user_id=replied_to_id,permissions=ChatPermissions(can_send_messages=True))
-            update.message.reply_text(f"Text here...",disable_web_page_preview =True,parse_mode = ParseMode.HTML,reply_markup=ReplyKeyboardRemove()) 
+            try:
+                if command == "/ban":
+                    bot.ban_chat_member(chat_id=group_id,user_id=replied_to_id)
+                elif command == "/unban":
+                    bot.unban_chat_member(chat_id=group_id,user_id=replied_to_id)
+                elif command == "/mute":
+                    bot.restrict_chat_member(chat_id=group_id,user_id=replied_to_id,permissions=ChatPermissions(can_send_messages=False))
+                elif command == "/unmute":
+                    bot.restrict_chat_member(chat_id=group_id,user_id=replied_to_id,permissions=ChatPermissions(can_send_messages=True))
+                #update.message.reply_text(f"Text here...",disable_web_page_preview =True,parse_mode = ParseMode.HTML,reply_markup=ReplyKeyboardRemove()) 
+            except:
+                pass
         else:
             pass
 
