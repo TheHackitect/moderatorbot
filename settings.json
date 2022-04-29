@@ -1,0 +1,25 @@
+{     
+    "greeting_tags":["Hi","Hello","Good morning","Good afternoon","Good evening"],
+    "welcome_message":"Feel free to ....",
+    "max_warning":2,
+    "warning_structure":{
+        "spam":{
+            "warnings":0
+        },
+        "external_links":{
+            "warnings":0
+        },
+        "abuse":{
+            "warnings":0
+        }
+    },
+    "allowed_links":[
+        "https://thehackitect.herokuapp.com",
+        "https://github.com/thehackitect"
+    ],
+        "question_tags":["what","how","where","why"],
+        "insult_tags":["stupid","idiot","bastard","moron","fuck","dick","pussy","bloody","orgasm","foolish","crazy","mad"],
+        "key_words":["maintenance"],
+        "maintenance":"The maintenance mode is activated when updates and upgrades are being carried out on the telegram bot. This will prevent users from encountering errors while using the bot. when you see this maintenance message, please exercise patience while the maintenance team work on the bot."
+        
+}
