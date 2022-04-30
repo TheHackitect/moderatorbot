@@ -239,19 +239,20 @@ def unknown_texts(update, context):
             regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
             urls = re.findall(regex,update.message.text)
             for link in urls:
-                if link not in allowed_links:
-                    if status == "creator" or status == "administrator":
+                if status == "creator" or status == "administrator":
+                    pass
+                elif link in allowed_links:
+                    pass
+                else:
+                    the_reply = update.message.reply_text("Take your links else where!",parse_mode = ParseMode.HTML)
+                    reply_message_id = the_reply.message_id
+                    time.sleep(5)
+                    try:
+                        bot.ban_chat_member(chat_id=group_id,user_id=sender_id)
+                        bot.delete_message(message_id = reply_message_id,chat_id = group_id)
+                        bot.delete_message(message_id = message_id,chat_id = group_id)
+                    except:
                         pass
-                    else:
-                        the_reply = update.message.reply_text("Take your links else where!",parse_mode = ParseMode.HTML)
-                        reply_message_id = the_reply.message_id
-                        time.sleep(5)
-                        try:
-                            bot.ban_chat_member(chat_id=group_id,user_id=sender_id)
-                            bot.delete_message(message_id = reply_message_id,chat_id = group_id)
-                            bot.delete_message(message_id = message_id,chat_id = group_id)
-                        except:
-                            pass
 
 def main():
     # Handlers
