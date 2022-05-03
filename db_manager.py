@@ -5,6 +5,8 @@ import itertools
 import cryptocode
 import json
 
+from sympy import Id
+
 # To enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -74,21 +76,15 @@ def set_up_campusbots_database():
     # Creating tables
     print("creatiing Tables.........")
     sql = """
-    create table users_database (ID integer,Name varchar(100),Balance varchar(100),Matric varchar(100),Phone varchar(100),Email varchar(100),Bio varchar(100),Status varchar(100),Warnings varchar(100),Wallet VARCHAR(7000),Referral_id varchar(100),Referrals varchar(100),Referral_earnings varchar(100));
-    create table admins (ID integer,fund varchar(100),super_admin varchar(100),ban_user varchar(100),make_admin varchar(100),pause_bot varchar(100),check_user varchar(100),job_pricing varchar(100),advert_pricing varchar(100),removing_users varchar(100),bank_detailing varchar(100), email_advert_Pricing varchar(100),minimum_withdrawal varchar(100), litecoin_pricing varchar(100));
-    create table settings (advert_price varchar(100), job_price varchar(100), bank_details varchar(100), report_email varchar(100), maintenance varchar(100), max_warning varchar(100),email_advert_price varchar(100),wallet VARCHAR(7000),minimum_withdrawal varchar(100),litecoin_earning_price varchar(100));
-    create table freelancer (ID integer,username varchar(100),rank varchar(100),specializations varchar(100),jobs varchar);
-    create table jobs (ID varchar,status varchar(100),Price varchar(100),Biders varchar,Title varchar,Description varchar,Job_type varchar);
+    create table users_database (ID integer,name varchar(100),username varchar(100),points varchar(100));
+    create table settings (allowed_links varchar, welcome_message varchar);
     """
     mycursor.execute(sql)
     mydb.commit()
     print("Successfully created all required tables.......")
     print("Inserting important values........")
     sql = """
-    INSERT INTO admins (ID,fund,super_admin,ban_user,make_admin,pause_bot,check_user,job_pricing,advert_pricing,removing_users,bank_detailing,email_advert_Pricing,minimum_withdrawal,litecoin_pricing) VALUES (1233125771, 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True', 'True','True','True','True');
-    INSERT INTO settings (advert_price, job_price, bank_details, report_email, maintenance, max_warning,Email_advert_price,minimum_withdrawal,litecoin_earning_price) values (0, 0, 'none', 'thehackitect.bots@gmail.com', 'False', 2, 0,0.001,0.00005);
-    INSERT INTO freelancer (ID,username,rank,specializations,jobs) VALUES (1233125771, 'thehackitect', '3', '[1,2,3,4,5,6,7,8,9,10]', '[thehackitect_1]');
-    INSERT INTO jobs (ID,Status,Price,Biders,Title,Description,Job_type) values ('thehackitect_1', 'Open', '5000','[1233125771]','Programming','This is the description on this project','Programming amd Technology');
+    INSERT INTO settings (allowed_links, welcome_message) values ('[]', 'walcome ');
     """
     mycursor.execute(sql)
     mydb.commit()
@@ -97,3 +93,5 @@ def set_up_campusbots_database():
 
 
 set_up_campusbots_database()
+
+#required
