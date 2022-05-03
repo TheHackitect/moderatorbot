@@ -8,6 +8,7 @@
 # https://api.telegram.org/1233125771/getme
 
 
+from codecs import replace_errors
 import psycopg2
 import logging
 import time
@@ -22,6 +23,9 @@ from telegram import *
 from telegram import update
 from telegram.ext import *
 from os import getenv as _
+import datetime
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 API_TOKEN = _("API_TOKEN")
@@ -71,6 +75,11 @@ developer = [
 
 markup_developer = InlineKeyboardMarkup(developer, one_time_keyboard=True)
 
+
+def time_stamp_maker(minutes):
+    now = datetime.now()
+    final_time = now + relativedelta(minutes=minutes)
+    return final_time
 
 def start_value(update: Update, context: CallbackContext):
     chat_type = update.effective_chat.type
@@ -141,7 +150,7 @@ def callback_handler(update: Update, context: CallbackContext):
         try:
             mycursor.execute(f"SELECT ID FROM users_database WHERE ID = '{user_id}' ")
             profile = mycursor.fetchone()[0]
-            bot.send_message(chat_id=update.message.chat_id,text=f'Hello {name}!',parse_mode = ParseMode.HTML,reply_markup = markup_ref_links)
+            bot.send_message(chat_id=user_id,text=f'Hello {name}!',parse_mode = ParseMode.HTML,reply_markup = markup_ref_links)
         except:
             mydb.rollback()
             mycursor.execute(sql, val)
@@ -182,6 +191,8 @@ def callback_handler(update: Update, context: CallbackContext):
         """       
         try:
             #mycursor.execute(f"SELECT In_group FROM users_database WHERE ID = '{user_id}' ")
+            group_id = target_group.replace("@","")
+            group_link = f"https://t.me/{group_id}"
             in_group_status = (bot.get_chat_member(user_id = user_id, chat_id = f"{target_group}")).status
             if in_group_status == "member" or in_group_status == "creator" or in_group_status == "administrator":
                 user_data = context.user_data
@@ -189,35 +200,29 @@ def callback_handler(update: Update, context: CallbackContext):
                 continue_keyboard = [[InlineKeyboardButton('Continue', callback_data=f'{keyboard_data}')]]
                 markup_continue_keyboard = InlineKeyboardMarkup(continue_keyboard, one_time_keyboard=True)
                 query.edit_message_text(text = "Confirmed✅")
+                #mycursor.execute(f"SELECT * FROM users_database WHERE ID = '{user_id}' ")
+                #profile = mycursor.fetchall()[0][0]
+                keyboard_data3 = (f'{{"type":"Telegram ref link","id":"{user_id}"}}')
+                keyboard_data6 = (f'{{"type":"Accumulated Points","id":"{user_id}"}}')
+                ref_links = [[InlineKeyboardButton('Telegram Referral',callback_data=f'{keyboard_data3}'),],
+                        [InlineKeyboardButton('Accumulated Points',callback_data=f'{keyboard_data6}')]]
+                markup_ref_links = InlineKeyboardMarkup(ref_links, resize_keyboard=True, one_time_keyboard=True)
+                bot.send_message(chat_id=callback_user_id,text=f'Welcome!',reply_markup = markup_ref_links) 
+                  
                 try:
-                    mycursor.execute(f"SELECT * FROM users_database WHERE ID = '{user_id}' ")
-                    profile = mycursor.fetchall()[0][0]
-                    keyboard_data3 = (f'{{"type":"Telegram ref link","id":"{user_id}"}}')
-                    keyboard_data6 = (f'{{"type":"Accumulated Points","id":"{user_id}"}}')
-                    ref_links = [[InlineKeyboardButton('Telegram Referral',callback_data=f'{keyboard_data3}'),],
-                            [InlineKeyboardButton('Accumulated Points',callback_data=f'{keyboard_data6}')]]
-                    markup_ref_links = InlineKeyboardMarkup(ref_links, resize_keyboard=True, one_time_keyboard=True)
-                    bot.send_message(chat_id=callback_user_id,text=f'Welcome!',reply_markup = markup_ref_links) 
+                    referrer = user_data['referrer_id']
+                    mycursor.execute(f"SELECT Points FROM users_database WHERE ID = '{referrer}' ")
+                    current_point = mycursor.fetchone()[0]
+                    new_point = int(current_point) + 1
+                    mycursor.execute(f"UPDATE users_database SET Points = '{new_point}' WHERE ID = {referrer}")
+                    mydb.commit()
                 except:
-                    '''
-                    this part will recall the referrer id and try to increse their points by one
-                    '''
-                    try:
-                        referrer = user_data['referrer_id']
-                        mycursor.execute(f"SELECT Points FROM users_databasse WHERE ID = '{referrer}' ")
-                        current_point = mycursor.fetchone()[0]
-                        new_point = int(current_point) + 1
-                        mycursor.execute(f"UPDATE users_database SET Points = '{new_point}' WHERE ID = {referrer}")
-                        mydb.commit()
-                    except:
-                        mydb.rollback()
-                        pass
-                        bot.send_message(chat_id=user_id,text=f'Welcome {name}! ',parse_mode = ParseMode.HTML,reply_markup = markup_ref_links)   
-                        return ConversationHandler.END
+                    mydb.rollback()
+                    bot.send_message(chat_id=user_id,text=f'Welcome {name}! ',parse_mode = ParseMode.HTML,reply_markup = markup_ref_links)   
             else:
                 keyboard_data = (f'{{"type":"join_group","id":"{user_id}"}}') # this is a dictionary that contains the user ID and the type of informations passed when pressed
                 Join_group_keyboard = [[InlineKeyboardButton('Joined✅', callback_data=f'{keyboard_data}'),
-                            InlineKeyboardButton(text='💬 Group', url=f'https://t.me/{target_group}')]]
+                            InlineKeyboardButton(text='💬 Group', url=group_link)]]
                 markup_Join_group_keyboard = InlineKeyboardMarkup(Join_group_keyboard, one_time_keyboard=True)
                 try:
                     query.edit_message_text(text = f"<b><i>Kindly join the group, and click the Joined button.</i></b>",reply_markup = markup_Join_group_keyboard,disable_web_page_preview = True,parse_mode=ParseMode.HTML)
@@ -227,12 +232,12 @@ def callback_handler(update: Update, context: CallbackContext):
             mydb.rollback()
             keyboard_data = (f'{{"type":"join_group","id":"{user_id}"}}') # this is a dictionary that contains the user ID and the type of informations passed when pressed
             Join_group_keyboard = [[InlineKeyboardButton('Joined✅', callback_data=f'{keyboard_data}'),
-                                    InlineKeyboardButton(text='💬 Group', url=f'https://t.me/{target_group}')]]
+                                    InlineKeyboardButton(text='💬 Group', url=group_link)]]
             markup_Join_group_keyboard = InlineKeyboardMarkup(Join_group_keyboard, one_time_keyboard=True)
             try:
-                query.edit_message_text(text = f"You have To join the group chat @ https://t.me/{target_group} and then click the joined button.",reply_markup = markup_Join_group_keyboard,disable_web_page_preview = True)
+                query.edit_message_text(text = f"You have To join the group chat @ {group_link} and then click the joined button.",reply_markup = markup_Join_group_keyboard,disable_web_page_preview = True)
             except:
-                query.edit_message_text(text = f"Join the group chat @ https://t.me/{target_group} and then click the joined button.",reply_markup = markup_Join_group_keyboard,disable_web_page_preview = True)
+                query.edit_message_text(text = f"Join the group chat @ {group_link} and then click the joined button.",reply_markup = markup_Join_group_keyboard,disable_web_page_preview = True)
 
 
 def get_point(var):
@@ -381,6 +386,8 @@ def new_group_mamber(update: Update, context: CallbackContext):
 
 # COMMANDS
 def commands(update, context):
+    mute_time = (load_settings()["mute_for"])
+    ban_time = (load_settings()["ban_for"])
     chat_type = update.effective_chat.type
     group_id = update.effective_chat.id
     try:
@@ -402,23 +409,25 @@ def commands(update, context):
             sql = f"DELETE FROM users_database WHERE ID = {update.message.chat_id}"
             mycursor.execute(sql)
             mydb.commit()
-            print("ok")
         else:
             bot.send_message(chat_id=update.effective_chat.id,text='❌ Unknown Command! \n reload the Menu by pressing /start')
          
     elif chat_type =='supergroup':
         if status == "creator" or status == "administrator":
-            try:
+            try: 
                 if command == "/ban":
-                    bot.ban_chat_member(chat_id=group_id,user_id=replied_to_id)
+                    bot.ban_chat_member(chat_id=group_id,user_id=replied_to_id,revoke_messages=True,until_date=time_stamp_maker(ban_time))
                 elif command == "/unban":
                     bot.unban_chat_member(chat_id=group_id,user_id=replied_to_id)
                 elif command == "/mute":
-                    bot.restrict_chat_member(chat_id=group_id,user_id=replied_to_id,permissions=ChatPermissions(can_send_messages=False))
+                    bot.restrict_chat_member(chat_id=group_id,user_id=replied_to_id,permissions=ChatPermissions(can_send_messages=False),until_date=time_stamp_maker(mute_time))
                 elif command == "/unmute":
                     bot.restrict_chat_member(chat_id=group_id,user_id=replied_to_id,permissions=ChatPermissions(can_send_messages=True))
                 elif command == "/leaderboard":
                     leaderboard = get_leaderboard(update,chat_type)
+                elif command == "/kick":
+                    bot.ban_chat_member(chat_id=group_id,user_id=replied_to_id)
+                    pass
             except:
                 pass
         else:

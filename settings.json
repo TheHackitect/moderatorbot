@@ -22,6 +22,12 @@
         "key_words":["maintenance"],
         "maintenance":"The maintenance mode is activated when updates and upgrades are being carried out on the telegram bot. This will prevent users from encountering errors while using the bot. when you see this maintenance message, please exercise patience while the maintenance team work on the bot.",
     
-    "use @ for handles":"Replace the below data",
-    "target_group_username":"@try_project"
+    "Replace the below data":"",
+    "target_group_username":"@try_project",
+
+    "Enter values in minuites":"",
+    "mute_for": 5,
+    "ban_for": 30
+
+    
 }
